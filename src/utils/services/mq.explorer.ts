@@ -2,7 +2,7 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { DiscoveryService, MetadataScanner, Reflector } from '@nestjs/core';
 import { MQ_CONSUMER_METADATA } from './mq.decorator';
-import { MqModuleConfig, MqService } from './rabbitmq.service';
+import { MqModuleConfig, MqService } from './mq.service';
 
 @Injectable()
 export class MqExplorer implements OnModuleInit {

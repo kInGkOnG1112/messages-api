@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { MessagesController } from './message.controller';
-import { MqModule } from 'src/utils/services/rabbitmq.module';
-import { ConfigModule } from '@nestjs/config';
+import { MqModule } from 'src/utils/services/mq.module';
 import { MessageConsumer } from './message.consumer';
 import { MessageTPayConsumer } from './message.consumer.tpay';
+import { MessageMachineConsumer } from './message.consumer.machine';
 
 @Module({
   imports: [
@@ -12,7 +12,8 @@ import { MessageTPayConsumer } from './message.consumer.tpay';
   controllers: [MessagesController],
   providers: [
     MessageConsumer, 
-    MessageTPayConsumer
+    MessageTPayConsumer,
+    MessageMachineConsumer
   ]
 })
 export class MessagesModule {}

@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import * as amqp from 'amqplib';
 import { config } from 'process';
 import * as fs from 'fs';
-import { MQ_EXPIRES, MQ_TTL } from './rabbitmq.constants';
+import { MQ_EXPIRES, MQ_TTL } from './mq.constants';
 
 export interface MqModuleConfig {
   exchange: string;

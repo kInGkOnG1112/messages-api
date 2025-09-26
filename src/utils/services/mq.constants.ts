@@ -54,3 +54,5 @@ export const X_CTMCTRLHUB_Q6_CASHOUTTRANSACTION = "CTMcontrolHubCashoutTransacti
 export const X_CTMCTRLHUB_Q7_SENDMONEYTRANSACTION = "CTMcontrolHubSendMoneyTransaction";
 export const X_CTMCTRLHUB_Q8_PAYBILLTRANSACTION = "CTMcontrolHubPaybillTransaction";
 export const X_CTMCTRLHUB_Q9_INQUIRYTRANSACTION = "CTMcontrolHubInquiryTransaction";
+
+export const CTMCoreTransactions = 'CTMCoreTransactions'

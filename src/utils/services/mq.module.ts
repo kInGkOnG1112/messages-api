@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { MqService } from './rabbitmq.service';
+import { MqService } from './mq.service';
 import { MqExplorer } from './mq.explorer';
 import { DiscoveryModule } from '@nestjs/core';
 
