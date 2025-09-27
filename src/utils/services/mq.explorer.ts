@@ -1,12 +1,13 @@
-// mq.explorer.ts
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { DiscoveryService, MetadataScanner, Reflector } from '@nestjs/core';
-import { MQ_CONSUMER_METADATA } from './mq.decorator';
-import { MqModuleConfig, MqService } from './mq.service';
+import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
+import { DiscoveryService, MetadataScanner, Reflector } from "@nestjs/core";
+import { MqService } from "./mq.service";
+import { CTMCORE_BINDINGS } from "./mq.constants";
+import { ROUTE_KEY_METADATA } from "./mq.decorator";
 
 @Injectable()
-export class MqExplorer implements OnModuleInit {
-  private readonly logger = new Logger(MqExplorer.name);
+export class RouteKeyExplorer implements OnModuleInit {
+  private readonly logger = new Logger(RouteKeyExplorer.name);
+  private readonly handlers = new Map<string, Function>();
 
   constructor(
     private readonly discovery: DiscoveryService,
@@ -29,24 +30,39 @@ export class MqExplorer implements OnModuleInit {
         prototype,
         (methodName: string) => {
           const methodRef = instance[methodName];
-          const config: MqModuleConfig = this.reflector.get(
-            MQ_CONSUMER_METADATA,
+          const routeKeys: string[] = this.reflector.get(
+            ROUTE_KEY_METADATA,
             methodRef,
           );
 
-          if (config) {
-            this.logger.log(
-              `Registering MQ consumer [${config.exchange}:${config.routingKey}] -> ${instance.constructor.name}.${methodName}()`,
-            );
-
-            this.mqService.consume(config, async (msg) => {
-              var msg = await this.mqService.extractStringMessageOrFile(msg.content, "c:\\temp");
-              const payload = JSON.parse(msg.toString());
-              await methodRef.call(instance, payload, msg);
-              return true;
-            });
+          if (routeKeys?.length) {
+            for (const key of routeKeys) {
+              this.logger.log(`Registered routeKey [${key}] → ${instance.constructor.name}.${methodName}()`);
+              this.handlers.set(key, methodRef.bind(instance));
+            }
           }
         },
+      );
+    }
+
+    for (const config of CTMCORE_BINDINGS){
+      await this.mqService.consume(
+        config, // bind to all keys
+        async (msg) => {
+          const { routingKey } = msg.fields;
+          const handler = this.handlers.get(routingKey);
+
+          if (handler) {
+            const extracted = await this.mqService.extractStringMessageOrFile(msg.content, "c:\\temp");
+            const payload = JSON.parse(msg.content.toString());
+            const { terminalId } = msg.properties?.headers
+            await handler(payload, terminalId, msg);
+            return true;
+          }
+
+          this.logger.warn(`No handler found for routingKey: ${routingKey}`);
+          return false;
+        }
       );
     }
   }

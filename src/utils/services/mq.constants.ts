@@ -2,57 +2,71 @@ export enum ExchangeType {
   TOPIC = 'topic',
 }
 
-export const CTM_EXCHANGE = 'CTM'
-export const CTMCORE_EXCHANGE = 'CTMCore'
-export const TPAY_EXCHANGE = 'TraxionPay'
-
 export const MQ_TTL = 300_000; // 5 mins
 export const MQ_EXPIRES = 1_800_000; // 30 mins
 
-export const X_CTM_Q1_NONTRANSACTION = "CTMNonTransaction";
-export const X_CTM_Q2_LOGS = "CTMLogs";
-export const X_CTM_Q3_CONTROL = "CTMcontrol";
-export const X_CTM_Q4_HBHEALTH = "CTMHBHealth";
-export const X_CTM_Q5_CASHINTRANSACTION = "CTMCashinTransaction";
-export const X_CTM_Q6_CASHOUTTRANSACTION = "CTMCashoutTransaction";
-export const X_CTM_Q7_SENDMONEYTRANSACTION = "CTMSendMoneyTransaction";
-export const X_CTM_Q8_PAYBILLTRANSACTION = "CTMPaybillTransaction";
-export const X_CTM_Q9_INQUIRYTRANSACTION = "CTMInquiryTransaction";
+// for exchange
+export const CTM_EXCHANGE = 'ctm'
+export const CTMCORE_EXCHANGE = 'ctmcore'
+export const CTMCONTROLLHUB_EXCHANGE = 'ctmcontrolhub'
+export const TPAY_EXCHANGE = 'tpay'
 
-export const C_CTMCORE = "CTM_CORE";
-export const X_CTMCORE = "CTMCore";
-export const X_CTMCORE_Q1_NONTRANSACTION = "CTMCoreNonTransaction";
-export const X_CTMCORE_Q2_LOGS = "CTMCoreLogs";
-export const X_CTMCORE_Q3_CONTROL = "CTMCoreControl";
-export const X_CTMCORE_Q4_HBHEALTH = "CTMCoreHBHealth";
-export const X_CTMCORE_Q5_CASHINTRANSACTION = "CTMCoreCashinTransaction";
-export const X_CTMCORE_Q6_CASHOUTTRANSACTION = "CTMCoreCashoutTransaction";
-export const X_CTMCORE_Q7_SENDMONEYTRANSACTION = "CTMCoreSendMoneyTransaction";
-export const X_CTMCORE_Q8_PAYBILLTRANSACTION = "CTMCorePaybillTransaction";
-export const X_CTMCORE_Q9_INQUIRYTRANSACTION = "CTMCoreInquiryTransaction";
+export const CTM_NONTRANSAC_EXCHANGE = 'ctm.nontransac'
+export const CTM_LOG_EXCHANGE = 'ctm.log'
+export const CTM_HBHEALTH_EXCHANGE = 'ctm.hbhealth'
+export const CTM_TRANSAC_EXCHANGE = 'ctm.transac'
 
-export const C_TPAY = "TPAY_APP";
-export const X_TPAY = "TraxionPay";
-export const X_TPAY_Q1_NONTRANSACTION = "TPayNonTransaction";
-export const X_TPAY_Q2_LOGS = "TPayLogs";
-export const X_TPAY_Q3_CONTROL = "TPayControl";
-export const X_TPAY_Q4_HBHEALTH = "TPayHBHealth";
-export const X_TPAY_Q5_CASHINTRANSACTION = "TPayCashinTransaction";
-export const X_TPAY_Q6_CASHOUTTRANSACTION = "TPayCashoutTransaction";
-export const X_TPAY_Q7_SENDMONEYTRANSACTION = "TPaySendMoneyTransaction";
-export const X_TPAY_Q8_PAYBILLTRANSACTION = "TPayPaybillTransaction";
-export const X_TPAY_Q9_INQUIRYTRANSACTION = "TPayInquiryTransaction";
 
-export const C_CTMCTRLHUB = "CTM_CTRLHUB";
-export const X_CTMCTRLHUB = "CTMcontrolHub";
-export const X_CTMCTRLHUB_Q1_NONTRANSACTION = "CTMcontrolHubNonTransaction";
-export const X_CTMCTRLHUB_Q2_LOGS = "CTMcontrolHubLogs";
-export const X_CTMCTRLHUB_Q3_CONTROL = "CTMcontrolHubControl";
-export const X_CTMCTRLHUB_Q4_HBHEALTH = "CTMcontrolHubHBHealth";
-export const X_CTMCTRLHUB_Q5_CASHINTRANSACTION = "CTMcontrolHubCashinTransaction";
-export const X_CTMCTRLHUB_Q6_CASHOUTTRANSACTION = "CTMcontrolHubCashoutTransaction";
-export const X_CTMCTRLHUB_Q7_SENDMONEYTRANSACTION = "CTMcontrolHubSendMoneyTransaction";
-export const X_CTMCTRLHUB_Q8_PAYBILLTRANSACTION = "CTMcontrolHubPaybillTransaction";
-export const X_CTMCTRLHUB_Q9_INQUIRYTRANSACTION = "CTMcontrolHubInquiryTransaction";
+// for que names
+export const CTMCORE_LOG_QUE = 'ctmcore.log'
+export const CTMCORE_CONTROL_QUE = 'ctmcore.control'
+export const CTMCORE_HBHEALTH_QUE = 'ctmcore.hbhealth'
+export const CTMCORE_NONTRANSAC_QUE = 'ctmcore.nontransac'
+export const CTMCORE_TRANSACT_CASHIN_QUE = 'ctmcore.transac.cashin'
+export const CTMCORE_TRANSACT_CASHOUT_QUE = 'ctmcore.transac.cashout'
+export const CTMCORE_TRANSACT_SENDMONEY_QUE = 'ctmcore.transac.sendmoney'
+export const CTMCORE_TRANSACT_PAYBILLS_QUE = 'ctmcore.transac.paybills'
 
-export const CTMCoreTransactions = 'CTMCoreTransactions'
+export const TPAY_LOG_QUE = 'tpay.log'
+export const TPAY_CONTROL_QUE = 'tpay.control'
+export const TPAY_HBHEALTH_QUE = 'tpay.hbhealth'
+export const TPAY_NONTRANSAC_QUE = 'tpay.nontransac'
+export const TPAY_TRANSACT_CASHIN_QUE = 'tpay.transac.cashin'
+export const TPAY_TRANSACT_CASHOUT_QUE = 'tpay.transac.cashout'
+export const TPAY_TRANSACT_SENDMONEY_QUE = 'tpay.transac.sendmoney'
+export const TPAY_TRANSACT_PAYBILLS_QUE = 'tpay.transac.paybills'
+
+export const CTMCONTROLLHUB_LOG_QUE = 'tpay.log'
+export const CTMCONTROLLHUB_CONTROL_QUE = 'tpay.control'
+export const CTMCONTROLLHUB_HBHEALTH_QUE = 'tpay.hbhealth'
+export const CTMCONTROLLHUB_NONTRANSAC_QUE = 'tpay.nontransac'
+
+// for bindings
+const TRANSACTION_TYPES = [
+  'cashin',
+  'cashout',
+  'sendmoney',
+  'paybills',
+  'inquiry',
+];
+
+export const CTMCORE_TRANSACTION_REQUEST_KEYS = TRANSACTION_TYPES.map( (t) => `ctmcore.transac.request.${t}` );
+export const CTMCORE_TRANSACTION_RESPONSE_KEYS = TRANSACTION_TYPES.map( (t) => `ctmcore.transac.response.${t}` );
+
+export const TPAY_TRANSACTION_REQUEST_KEYS = TRANSACTION_TYPES.map( (t) => `tpay.transac.request.${t}` );
+export const TPAY_TRANSACTION_RESPONSE_KEYS = TRANSACTION_TYPES.map( (t) => `tpay.transac.response.${t}` );
+
+export const CTMCORE_BINDINGS = [
+  { exchange: TPAY_LOG_QUE, queue: TPAY_LOG_QUE, routingKey: '#' },
+  { exchange: TPAY_CONTROL_QUE, queue: TPAY_CONTROL_QUE, routingKey: '#' },
+  { exchange: TPAY_HBHEALTH_QUE, queue: TPAY_HBHEALTH_QUE, routingKey: '#' },
+  { exchange: TPAY_NONTRANSAC_QUE, queue: TPAY_NONTRANSAC_QUE, routingKey: '#' },
+  { exchange: TPAY_TRANSACT_CASHIN_QUE, queue: TPAY_TRANSACT_CASHIN_QUE, routingKey: '#' },
+  { exchange: TPAY_TRANSACT_CASHOUT_QUE, queue: TPAY_TRANSACT_CASHOUT_QUE, routingKey: '#' },
+  { exchange: TPAY_TRANSACT_SENDMONEY_QUE, queue: TPAY_TRANSACT_SENDMONEY_QUE, routingKey: '#' },
+  { exchange: TPAY_TRANSACT_PAYBILLS_QUE, queue: TPAY_TRANSACT_PAYBILLS_QUE, routingKey: '#' },
+  { exchange: CTM_NONTRANSAC_EXCHANGE, queue: `R11-OPMD5KFCO10009LC.nontransac`, routingKey: 'R11-OPMD5KFCO10009LC.#' },
+  { exchange: CTM_NONTRANSAC_EXCHANGE, queue: `R11-OPME271MP20004LC.nontransac`, routingKey: 'R11-OPME271MP20004LC.#' },
+  { exchange: CTM_EXCHANGE, queue: `R11-OPMD5KFCO10009LC.transac`, routingKey: 'R11-OPMD5KFCO10009LC.#' },
+  { exchange: CTM_EXCHANGE, queue: `R11-OPME271MP20004LC.transac`, routingKey: 'R11-OPME271MP20004LC.#' },
+]

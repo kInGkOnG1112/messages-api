@@ -9,6 +9,7 @@ export interface MqModuleConfig {
   exchange: string;
   queue: string;
   routingKey: string;
+  headers?: {}
 }
 
 @Injectable()
@@ -48,17 +49,24 @@ export class MqService implements OnModuleDestroy {
         'x-expires': MQ_EXPIRES 
       },
     });
-    await this.channel.bindQueue(
-      module.queue, 
-      module.exchange, 
-      module.routingKey
-    );
+    // await this.channel.bindQueue(
+    //   module.queue, 
+    //   module.exchange, 
+    //   module.routingKey,
+    //   { 
+    //     'x-message-ttl': MQ_TTL, 
+    //     'x-expires': MQ_EXPIRES 
+    //   }
+    // );
 
     const published = this.channel.publish(
       module.exchange,
       module.routingKey,
       Buffer.from(JSON.stringify(message)),
-      { persistent: true },
+      { 
+        persistent: true,
+        headers: module.headers
+       },
     );
 
     if (published) {

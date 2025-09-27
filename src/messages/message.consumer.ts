@@ -1,6 +1,4 @@
 import { Injectable } from "@nestjs/common";
-import { MqConsumer } from "src/utils/services/mq.decorator";
-import { CTM_EXCHANGE, TPAY_EXCHANGE, X_CTM_Q1_NONTRANSACTION, X_CTM_Q6_CASHOUTTRANSACTION, X_TPAY_Q5_CASHINTRANSACTION, X_TPAY_Q6_CASHOUTTRANSACTION } from "src/utils/services/mq.constants";
 import { MqService } from "src/utils/services/mq.service";
 
 @Injectable()
@@ -9,23 +7,23 @@ export class MessageConsumer {
     private readonly mqService: MqService
   ){}
 
-  @MqConsumer({
-    exchange: CTM_EXCHANGE,
-    routingKey: 'ctm.machine.activate',
-    queue: `R11-OPME271MP20004LC.${X_CTM_Q1_NONTRANSACTION}`
-  })
-  async activateMachine(msg: any){
-    console.log(msg, 'msge response for R11-OPME271MP20004LC')
-  }
+  // @MqConsumer({
+  //   exchange: CTM_EXCHANGE,
+  //   routingKey: 'ctm.machine.activate',
+  //   queue: `R11-OPME271MP20004LC.${X_CTM_Q1_NONTRANSACTION}`
+  // })
+  // async activateMachine(msg: any){
+  //   console.log(msg, 'msge response for R11-OPME271MP20004LC')
+  // }
 
-  @MqConsumer({
-    exchange: CTM_EXCHANGE,
-    routingKey: 'ctm.machine.activate',
-    queue: `R11-OPMD5KFCO10009LC.${X_CTM_Q1_NONTRANSACTION}`
-  })
-  async activateMachine1(msg: any){
-    console.log(msg, 'msge response for R11-OPMD5KFCO10009LC')
-  }
+  // @MqConsumer({
+  //   exchange: CTM_EXCHANGE,
+  //   routingKey: 'ctm.machine.activate',
+  //   queue: `R11-OPMD5KFCO10009LC.${X_CTM_Q1_NONTRANSACTION}`
+  // })
+  // async activateMachine1(msg: any){
+  //   console.log(msg, 'msge response for R11-OPMD5KFCO10009LC')
+  // }
 
   // @MqConsumer({
   //   exchange: CTM_EXCHANGE,
@@ -36,14 +34,14 @@ export class MessageConsumer {
   //   console.log(msg, ' msge response for R11-OPME271MP20004LC')
   // }
 
-  @MqConsumer({
-    exchange: CTM_EXCHANGE,
-    routingKey: 'R11-OPMD5KFCO10009LC.cashOut.response',
-    queue: 'R11-OPMD5KFCO10009LC.Transactional'
-  })
-  async cashOutConsume(msg: any){
-    console.log(msg, ' msge response for R11-OPMD5KFCO10009LC')
-  }
+  // @MqConsumer({
+  //   exchange: CTM_EXCHANGE,
+  //   routingKey: 'R11-OPMD5KFCO10009LC.cashOut.response',
+  //   queue: 'R11-OPMD5KFCO10009LC.Transactional'
+  // })
+  // async cashOutConsume(msg: any){
+  //   console.log(msg, ' msge response for R11-OPMD5KFCO10009LC')
+  // }
 
   // @MqConsumer({
   //   exchange: 'TraxionPay',
