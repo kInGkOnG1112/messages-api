@@ -1,99 +1,66 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { CreateMessageDto } from './dtos/create-message.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { MqService } from 'src/utils/services/mq.service';
-import { TransactionPaylodDto } from './dtos/transaction.dto';
-import { CTMCORE_EXCHANGE } from 'src/utils/services/mq.constants';
+import { formatMQResponse } from 'src/utils/helpers/helpers';
 
 @ApiTags('Machine')
 @Controller('machine')
 export class MessagesController {
   constructor(
     private readonly mqService: MqService
-    // @Inject(TRANSACTION_CLIENT)
-    // private readonly transactionRMQClient: ClientProxy
   ){}
 
   @Post()
   @ApiOperation({ summary: 'Send sample data to MQ' })
-  sendMessage(@Body() requestData: CreateMessageDto) {
-    console.log("===================== Machine Emit Transaction =====================");
-    // this.mqService.sendMessage({
-    //   exchange: CTMCORE_EXCHANGE,
-    //   routingKey: 'ctmCore.machine.activate',
-    //   queue: `Test${X_CTMCORE_Q1_NONTRANSACTION}`
-    // }, requestData);
+  sendMessage(@Body() requestData: any) {
     this.mqService.sendMessage({
-      // exchange: 'ctmcore',
-      // routingKey: 'ctmcore.transac.request.cashin',
-      // queue: 'ctmcore.transac.cashin',
-      // headers: { terminalId: requestData.terminalId }
-
-      exchange: 'ctmcore.nontransac',
-      routingKey: 'ctmcore.machine.activate',
-      queue: 'ctmcore.nontransac',
-      headers: { terminalId: requestData.terminalId }
+      queue: 'ctmcore',
+      headers: { terminalId: process.env.MACHINE_TERMINAL_ID }
     }, requestData);
-    console.log("Machine Activation Sent to CTM API MQ: ", requestData);
-    console.log("==================================================================");
-
     return { 
-      message: 'Message sent!',
+      message: 'Machine activation message sent!',
       data: requestData
     };
   }
 
-  @Post('/cashOut')
+  @Post('transaction/cashout')
   @ApiOperation({ summary: 'Send sample data to MQ' })
-  cashOut(@Body() requestData: TransactionPaylodDto) {
-    console.log("===================== Machine Emit Transaction =====================");
+  cashOut(@Body() requestData: any) {
     this.mqService.sendMessage({
-      exchange: CTMCORE_EXCHANGE,
-      routingKey: 'ctmCore.cashOut.request',
-      queue: 'X_CTMCORE_Q6_CASHOUTTRANSACTION',
-      headers: { terminalId: requestData.terminalId }
-    }, requestData);
-    console.log("Machine Cash Out Sent to CTM API MQ: ", requestData);
-    console.log("==================================================================");
-
+      queue: 'ctmcore',
+      headers: { terminalId: process.env.MACHINE_TERMINAL_ID }
+    }, formatMQResponse('transac.cashout', requestData));
+    
     return { 
-      message: 'Message sent!',
+      message: 'Machine transaction cashout message sent!',
       data: requestData
     };
   }
 
-  @Post('/cashin')
+  @Post('transaction/cashin')
   @ApiOperation({ summary: 'Send sample data to MQ' })
-  cashIn(@Body() requestData: TransactionPaylodDto) {
-    console.log("===================== Machine Emit Transaction =====================");
+  cashIn(@Body() requestData: any) {
     this.mqService.sendMessage({
-      exchange: 'CTMCore',
-      routingKey: 'ctmCore.cashin',
-      queue: 'CTMCoreCashinTransaction'
-    }, requestData);
-    console.log("Machine Transaction Sent to CTM API MQ: ", requestData);
-    console.log("==================================================================");
+      queue: 'ctmcore',
+      headers: { terminalId: process.env.MACHINE_TERMINAL_ID }
+    }, formatMQResponse('transac.cashin', requestData));
 
     return { 
-      message: 'Message sent!',
+      message: 'Machine transaction cashin message sent!',
       data: requestData
     };
   }
 
-  @Post('/send-money')
+  @Post('transaction/send-money')
   @ApiOperation({ summary: 'Send sample send money data to MQ' })
-  sendMoney(@Body() requestData: TransactionPaylodDto) {
-    console.log("===================== Machine Emit Transaction =====================");
+  sendMoney(@Body() requestData: any) {
     this.mqService.sendMessage({
-      exchange: 'CTMCore',
-      routingKey: 'ctmCore.sendMoney',
-      queue: 'CTMCoreSendMoneyTransaction'
-    }, requestData);
-    console.log("Machine Send Money Sent to CTM API MQ: ", requestData);
-    console.log("==================================================================");
+      queue: 'ctmcore',
+      headers: { terminalId: process.env.MACHINE_TERMINAL_ID }
+    }, formatMQResponse('transac.sendmoney', requestData));
 
     return { 
-      message: 'Message sent!',
+      message: 'Machine transaction send-money message sent!',
       data: requestData
     };
   }

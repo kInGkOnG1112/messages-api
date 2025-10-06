@@ -14,3 +14,14 @@ export class CreateMessageDto {
   @Length(1, 150)
   serialNumber: string;
 }
+
+export class GenericMessageDto {
+  
+  @ApiProperty({ maxLength: 50 })
+  @IsString()
+  @IsNotEmpty()
+  @Length(1, 50)
+  msgType: string;
+
+  
+}

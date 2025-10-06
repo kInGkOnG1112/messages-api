@@ -1,15 +1,15 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as amqp from 'amqplib';
-import { config } from 'process';
 import * as fs from 'fs';
 import { MQ_EXPIRES, MQ_TTL } from './mq.constants';
 
 export interface MqModuleConfig {
-  exchange: string;
+  exchange?: string;
   queue: string;
-  routingKey: string;
-  headers?: {}
+  routingKey?: string;
+  headers?: Record<string, any>;
+  exchangeType?: 'direct' | 'topic' | 'fanout' | 'default';
 }
 
 @Injectable()
@@ -34,34 +34,38 @@ export class MqService implements OnModuleDestroy {
 
   async sendMessage(module: MqModuleConfig, message: any): Promise<void> {
     await this.init();
-    await this.channel.assertExchange(module.exchange, 'topic', {
-      durable: true,
-      arguments: { 
-        'x-message-ttl': MQ_TTL, 
-        'x-expires': MQ_EXPIRES 
-      },
-    });
-    await this.channel.assertQueue(module.queue, {
-      exclusive: false,
-      durable: true,
-      arguments: { 
-        'x-message-ttl': MQ_TTL, 
-        'x-expires': MQ_EXPIRES 
-      },
-    });
-    // await this.channel.bindQueue(
-    //   module.queue, 
-    //   module.exchange, 
-    //   module.routingKey,
-    //   { 
-    //     'x-message-ttl': MQ_TTL, 
-    //     'x-expires': MQ_EXPIRES 
-    //   }
-    // );
+
+    const exchangeType = module.exchangeType || 'direct';
+    let exchangeName = module.exchange || '';
+    let routingKey = module.routingKey || module.queue;
+
+    if (exchangeType !== 'direct') {
+      await this.channel.assertExchange(exchangeName, exchangeType, {
+        durable: true,
+        arguments: { 'x-message-ttl': MQ_TTL, 'x-expires': MQ_EXPIRES },
+      });
+
+      await this.channel.assertQueue(module.queue, {
+        exclusive: false,
+        durable: true,
+        arguments: { 'x-message-ttl': MQ_TTL, 'x-expires': MQ_EXPIRES },
+      });
+
+      await this.channel.bindQueue(module.queue, exchangeName, routingKey);
+    } else {
+      exchangeName = '';
+      routingKey = module.queue;
+
+      await this.channel.assertQueue(module.queue, {
+        exclusive: false,
+        durable: true,
+        arguments: { 'x-message-ttl': MQ_TTL, 'x-expires': MQ_EXPIRES },
+      });
+    }
 
     const published = this.channel.publish(
-      module.exchange,
-      module.routingKey,
+      exchangeName,
+      routingKey,
       Buffer.from(JSON.stringify(message)),
       { 
         persistent: true,
@@ -84,34 +88,61 @@ export class MqService implements OnModuleDestroy {
     module: MqModuleConfig,
     callback: (msg: amqp.ConsumeMessage) => Promise<boolean>,
   ): Promise<void> {
-    await this.init();
 
-    await this.channel.assertExchange(module.exchange, 'topic', { durable: true,
-      arguments: { 'x-message-ttl': MQ_TTL, 'x-expires': MQ_EXPIRES }, });
-    await this.channel.assertQueue(module.queue, { durable: true,
-      arguments: { 'x-message-ttl': MQ_TTL, 'x-expires': MQ_EXPIRES }, });
-    await this.channel.bindQueue(module.queue, module.exchange, module.routingKey);
+    console.log(module)
+    try {
+      await this.init();
 
-    this.channel.consume(
-      module.queue,
-      async (msg) => {
-        if (!msg) return;
+      const exchangeType = module.exchangeType || 'direct';
 
-        try {
-          const ok = await callback(msg);
-          ok ? this.channel.ack(msg) : this.channel.nack(msg);
-        } catch (err) {
-          this.logger.error('Error processing message', err.stack);
-          this.channel.nack(msg);
-        }
-      },
-      { noAck: false },
-    );
+      await this.channel.assertQueue(module.queue, {
+        durable: true,
+        arguments: { 'x-message-ttl': MQ_TTL, 'x-expires': MQ_EXPIRES },
+      });
 
-    console.log(`Consumer started on exchange [${module.exchange}] queue [${module.queue}]`)
-    this.logger.log(
-      `Consumer started on exchange [${module.exchange}] queue [${module.queue}]`,
-    );
+      if (exchangeType !== 'default') {
+        await this.channel.assertExchange(module.exchange, exchangeType, {
+          durable: true,
+          arguments: { 'x-message-ttl': MQ_TTL, 'x-expires': MQ_EXPIRES },
+        });
+
+        const routing =
+          exchangeType === 'fanout' ? '' : (module.routingKey || '');
+        await this.channel.bindQueue(module.queue, module.exchange, routing);
+      }
+
+      this.channel.consume(
+        module.queue,
+        async (msg) => {
+          if (!msg) return;
+          try {
+            const ok = await callback(msg);
+            if (ok) {
+              this.channel.ack(msg);
+            } else {
+              this.logger.warn(
+                `Invalid message dropped: ${msg.content.toString()}`,
+              );
+              this.channel.nack(msg, false, false);
+            }
+          } catch (err) {
+            this.logger.error(
+              `Error processing message: ${err.message}`,
+              err.stack,
+            );
+            this.channel.nack(msg, false, false);
+          }
+        },
+        { noAck: false },
+      );
+
+      this.logger.log(
+        `✅ Consumer started → Exchange [${module.exchange || '(default)'}] | Type [${exchangeType}] | Queue [${module.queue}] | Routing Key [${module.routingKey || '(n/a)'}]`,
+      );
+    } catch (err) {
+      console.log(`Failed to parse/handle: ${err.message}`);
+      this.logger.error(`Failed to parse/handle: ${err.message}`);
+    }
   }
 
   async onModuleDestroy() {

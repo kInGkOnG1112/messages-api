@@ -46,24 +46,37 @@ export class RouteKeyExplorer implements OnModuleInit {
     }
 
     for (const config of CTMCORE_BINDINGS){
-      await this.mqService.consume(
-        config, // bind to all keys
-        async (msg) => {
-          const { routingKey } = msg.fields;
-          const handler = this.handlers.get(routingKey);
-
-          if (handler) {
-            const extracted = await this.mqService.extractStringMessageOrFile(msg.content, "c:\\temp");
-            const payload = JSON.parse(msg.content.toString());
-            const { terminalId } = msg.properties?.headers
-            await handler(payload, terminalId, msg);
-            return true;
+      await this.mqService.consume(config, async (msg) => {
+        try {
+          let payload: any;
+          try {
+            payload = JSON.parse(msg.content.toString());
+          } catch (err) {
+            this.logger.warn(`Invalid JSON message: ${msg.content.toString()}`);
+            return false;
           }
 
-          this.logger.warn(`No handler found for routingKey: ${routingKey}`);
+          const { msgType, data } = payload || {};
+          const terminalId = msg.properties?.headers?.terminalId;
+
+          if (!msgType) {
+            this.logger.warn(`Message missing msgType: ${JSON.stringify(payload)}`);
+            return false;
+          }
+
+          const handler = this.handlers.get(msgType);
+          if (!handler) {
+            this.logger.warn(`No handler found for message type: ${msgType}`);
+            return false;
+          }
+
+          await handler(data, { ...msg, msgType, terminalId });
+          return true;
+        } catch (err) {
+          this.logger.error(`Error processing MQ message: ${err.message}`, err.stack);
           return false;
         }
-      );
+      });
     }
   }
 }
